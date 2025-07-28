@@ -12,7 +12,7 @@ from tree_generator import generate_directory_tree
 from pathlib import Path
 
 
-def aggregate_code(project_path: str, text: Dict[str, str]) -> bool:
+def aggregate_code(project_path: str, text: Dict[str, str], include_text: bool = False) -> bool:
     """Main function to aggregate project source code"""
     if not os.path.isdir(project_path):
         print(text["not_found"].format(path=project_path))
@@ -29,6 +29,11 @@ def aggregate_code(project_path: str, text: Dict[str, str]) -> bool:
         print(text["no_tech"])
 
     target_extensions: Set[str] = get_extensions_by_tech(detected_techs)
+    
+    # ✅ Thêm .txt và .md nếu bật cờ
+    if include_text:
+        target_extensions.update({".txt", ".md"})
+
     get_essential_files()
     exclude_dirs, exclude_files = get_exclude_patterns()
 
@@ -59,8 +64,7 @@ def aggregate_code(project_path: str, text: Dict[str, str]) -> bool:
 
     for root, dirs, files in os.walk(project_path):
         dirs[:] = [
-            d
-            for d in dirs
+            d for d in dirs
             if not should_exclude_path(os.path.join(root, d), exclude_dirs)
         ]
 
@@ -68,9 +72,7 @@ def aggregate_code(project_path: str, text: Dict[str, str]) -> bool:
             file_path = os.path.join(root, file)
             rel_path = os.path.relpath(file_path, project_path)
 
-            if should_exclude_path(
-                rel_path, exclude_dirs
-            ) or should_exclude_file(file, exclude_files):
+            if should_exclude_path(rel_path, exclude_dirs) or should_exclude_file(file, exclude_files):
                 continue
 
             file_ext = Path(file).suffix.lower()
@@ -89,9 +91,7 @@ def aggregate_code(project_path: str, text: Dict[str, str]) -> bool:
                     continue
 
                 print(text["processing"].format(file=rel_path))
-                with open(
-                    file_path, "r", encoding="utf-8", errors="ignore"
-                ) as f:
+                with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
                     file_content = f.read()
 
                 content_lines.append(f"### {rel_path}")
@@ -105,9 +105,7 @@ def aggregate_code(project_path: str, text: Dict[str, str]) -> bool:
 
             except Exception as e:
                 content_lines.append(f"### {rel_path}")
-                content_lines.append(
-                    f"```\n# Error reading file: {str(e)}\n```"
-                )
+                content_lines.append(f"```\n# Error reading file: {str(e)}\n```")
                 content_lines.append("")
 
     output_path = os.path.join(project_path, "source_dump.txt")
@@ -125,9 +123,7 @@ def aggregate_code(project_path: str, text: Dict[str, str]) -> bool:
         print("")
         print(text["summary"])
         print(text["file_count"].format(count=file_count))
-        print(
-            text["size"].format(size=len(final_content), kb=total_size // 1024)
-        )
+        print(text["size"].format(size=len(final_content), kb=total_size // 1024))
         print(text["line_count"].format(lines=line_count))
         return True
 
