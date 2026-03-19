@@ -33,7 +33,7 @@ def detect_project_tech(project_path: str) -> List[str]:
         "ios": ["*.xcodeproj", "*.xcworkspace"],
         "java": ["pom.xml", "*.java"],
         "kotlin": ["*.kt"],
-        "csharp": ["*.csproj", "Program.cs"],
+        "csharp": ["*.csproj", "*.sln", "Program.cs", "appsettings.json", "Web.config"],
         "php": ["composer.json"],
         "ruby": ["Gemfile"],
         "go": ["go.mod"],
@@ -52,8 +52,25 @@ def detect_project_tech(project_path: str) -> List[str]:
         "deno": ["deno.json"],
         "bun": ["bun.lockb"],
     }
-
     detected_techs: Set[str] = set()
+
+    # Common AI instruction folders/files to check
+    ai_indicators = [
+        ".agents", ".cursor", ".cline", ".agent", "_agent", "_agents",
+        "ai_instructions.md", "instructions.md", "architecture.md", 
+        ".clinerules", ".cursorrules"
+    ]
+    for indicator in ai_indicators:
+        # Check dirs
+        if any(indicator in d for root, dirs, files in os.walk(project_path) for d in dirs):
+            detected_techs.add("ai_instructions")
+            break
+        # Check files in root
+        if indicator in os.listdir(project_path):
+            detected_techs.add("ai_instructions")
+            break
+
+
 
     for root, _dirs, files in os.walk(project_path):
         rel_root: str = os.path.relpath(root, project_path)
@@ -129,7 +146,10 @@ def get_extensions_by_tech(techs: List[str]) -> Set[str]:
         "yaml": [".yml", ".yaml"],
         "toml": [".toml"],
         "xml": [".xml"],
+        # AI Instructions
+        "ai_instructions": [".md", ".txt", ".json", ".yml", ".yaml", ".clinerules", ".cursorrules"],
     }
+
 
     extensions: Set[str] = set()
     for tech in techs:

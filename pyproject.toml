@@ -1,7 +1,14 @@
 [project]
 name = "projectdump"
-version = "0.1.0"
-description = "Add your description here"
+version = "2.0.0"
+description = "ProjectDump is a tool for aggregating project source code into a single file."
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.12"
 dependencies = []
+
+[project.scripts]
+pd = "main:main"
+projectdump = "main:main"
+
+[tool.setuptools]
+py-modules = ["aggregator", "constants", "detector", "filters", "main", "one_file_version", "tree_generator"]

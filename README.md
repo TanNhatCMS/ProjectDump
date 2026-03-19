@@ -44,22 +44,22 @@
   📝 Processing: tree_generator.py
   📝 Processing: __main__.py
 
-✅ Success! File created: /path/to/your/project/source_dump.txt
+✅ Success! File created: /path/to/your/project/project_codebase.md
 
 📊 Summary:
    - Files processed: 7
    - Output size: 30275 characters (~28 KB)
    - Total lines: 870
 
-🎉 Done! The source_dump.txt file is ready.
+🎉 Done! The project_codebase.md file is ready.
 ```
 
-Inside `source_dump.txt`demo:
+Inside `project_codebase.md` demo:
 
 ```text
 # ==================================================
-# Path: /path/to/your/project
-# Detected tech: python
+# Project Path: /path/to/your/project
+# Detected Tech: python
 # ==================================================
 
 ## DIRECTORY STRUCTURE
@@ -72,7 +72,7 @@ New folder/
 ├── detector.py
 ├── filters.py
 ├── one_file_version.py
-├── source_dump.txt
+├── project_codebase.md
 └── tree_generator.py
 
 ## FILE CONTENTS
@@ -83,13 +83,38 @@ import os
 ...
 ```
 
-## 🚀 Usage
-
 Run from the command line:
 
 ```bash
   python main.py /path/to/your/project
 ```
+
+### 🚅 Faster Ways to Run:
+
+**1. Using the shortcut (Windows):**
+Just double-click `run.bat` or run:
+```cmd
+  run.bat /path/to/your/project
+```
+
+**2. As a command (Global):**
+Install once:
+```bash
+  pip install -e .
+```
+Then run from anywhere:
+```bash
+  pd /path/to/your/project
+```
+
+---
+
+## 🤖 AI-Ready Packaging
+ProjectDump is optimized for AI analysis:
+- **AI Instructions**: Automatically includes folders like `.cursor`, `.agents`, `.cline`, and `_agent` which are normally ignored by other tools.
+- **Clean Architecture**: Better detection for .NET solutions and Clean Architecture patterns (includes `appsettings.json`, `Web.config`, etc.).
+
+
 
 ## 📁 What It Ignores
 
