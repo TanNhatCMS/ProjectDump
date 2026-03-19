@@ -369,10 +369,15 @@ def aggregate_code(
             with open(file_path, "r", encoding="utf-8") as f:
                 content = f.read()
                 if content.strip():
+                    # Use dynamic fencing to handle nested backticks
+                    fence = "```"
+                    while fence in content:
+                        fence += "`"
+                    
                     code_content.append(f"\n## {os.path.basename(file_path)}\n")
-                    code_content.append("```\n")
+                    code_content.append(fence + "\n")
                     code_content.append(content)
-                    code_content.append("\n```\n")
+                    code_content.append("\n" + fence + "\n")
         except Exception as e:
             code_content.append(f"\n## {os.path.basename(file_path)}\n")
             code_content.append(f"Error reading file: {str(e)}\n")
@@ -431,7 +436,7 @@ def main() -> None:
     code_content = aggregate_code(project_path, exclude_dirs, exclude_files)
 
     # Write output
-    output_path = os.path.join(project_path, "source_dump.txt")
+    output_path = os.path.join(project_path, "project_codebase.md")
     try:
         with open(output_path, "w", encoding="utf-8") as f:
             f.write(code_content)

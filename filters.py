@@ -1,5 +1,7 @@
+import fnmatch
+import os
 from pathlib import Path
-from typing import Set, Tuple, Union
+from typing import List, Optional, Set, Tuple, Union
 
 
 def get_essential_files() -> Set[str]:
@@ -157,18 +159,116 @@ def get_exclude_patterns() -> Tuple[Set[str], Set[str]]:
         "*.bak",
         "*.swp",
         "*.swo",
+        # ProjectDump output files
+        "project_codebase.md",
+        "source_dump.txt",
     }
 
     return exclude_dirs, exclude_files
 
 
-def should_exclude_path(path: Union[str, Path], exclude_dirs: Set[str]) -> bool:
-    return any(part.lower() in exclude_dirs for part in Path(path).parts)
+class GitIgnoreFilter:
+    def __init__(self, project_path: Union[str, Path]):
+        self.project_path = Path(project_path)
+        self.patterns = self._load_gitignore()
+
+    def _load_gitignore(self) -> List[str]:
+        patterns = []
+        gitignore_path = self.project_path / ".gitignore"
+        if gitignore_path.exists():
+            try:
+                with open(gitignore_path, "r", encoding="utf-8", errors="ignore") as f:
+                    for line in f:
+                        line = line.strip()
+                        if line and not line.startswith("#"):
+                            # Xử lý pattern kết thúc bằng / (thư mục)
+                            if line.endswith("/"):
+                                patterns.append(line + "*")
+                            patterns.append(line)
+            except Exception:
+                pass
+        return patterns
+
+    def is_ignored(self, rel_path: str) -> bool:
+        """Kiểm tra xem file/thư mục có bị ignore bởi .gitignore không"""
+        if not self.patterns:
+            return False
+
+        # Chuẩn hóa path sang kiểu unix để match pattern
+        normalized_path = rel_path.replace("\\", "/")
+        
+        for pattern in self.patterns:
+            # Xử lý pattern bắt đầu bằng / (root-relative)
+            if pattern.startswith("/"):
+                p = pattern[1:]
+                if fnmatch.fnmatchcase(normalized_path, p) or \
+                   fnmatch.fnmatchcase(normalized_path, p + "/*"):
+                    return True
+            else:
+                # Pattern có thể ở bất kỳ đâu
+                if fnmatch.fnmatchcase(normalized_path, pattern) or \
+                   fnmatch.fnmatchcase(os.path.basename(normalized_path), pattern) or \
+                   any(fnmatch.fnmatchcase(part, pattern) for part in normalized_path.split("/")) or \
+                   fnmatch.fnmatchcase(normalized_path, "*/" + pattern) or \
+                   fnmatch.fnmatchcase(normalized_path, "*/" + pattern + "/*"):
+                    return True
+        return False
 
 
-def should_exclude_file(filename: str, exclude_files: Set[str]) -> bool:
+def get_ai_root_patterns() -> Set[str]:
+    """Các file hướng dẫn AI ở ROOT được ưu tiên bao gồm"""
+    return {
+        "ai_instructions.md", "instructions.md", "architecture.md",
+        "system_prompt.md", "context.md", "project_rules.md",
+        ".clinerules", ".cursorrules", ".windsurfrules", "tasks.md",
+        "README.md"
+    }
+
+
+def get_ai_allowlist() -> Set[str]:
+    """Các thư mục và file liên quan đến AI instruction không được bị loại bỏ"""
+    return {
+        ".agents", ".agent", "_agents", "_agent", 
+        ".cursor", ".cline", ".ai_instructions", ".clinerules"
+    }
+
+
+def should_exclude_path(
+    path: Union[str, Path], 
+    exclude_dirs: Set[str], 
+    gitignore_filter: Optional[GitIgnoreFilter] = None
+) -> bool:
+    path_obj = Path(path)
+    parts = [p.lower() for p in path_obj.parts]
+    
+    # ✅ Nếu là thư mục AI thì KHÔNG loại bỏ
+    ai_allowlist = get_ai_allowlist()
+    if any(p in ai_allowlist for p in parts):
+        return False
+        
+    # Check default exclude dirs
+    if any(part.lower() in exclude_dirs for part in parts):
+        return True
+
+    # Check gitignore
+    if gitignore_filter:
+        rel_path = str(path)
+        if gitignore_filter.is_ignored(rel_path):
+            return True
+
+    return False
+
+
+def should_exclude_file(
+    filename: str, 
+    exclude_files: Set[str], 
+    rel_path: Optional[str] = None,
+    gitignore_filter: Optional[GitIgnoreFilter] = None
+) -> bool:
     filename_lower = filename.lower()
-    return any(
+    
+    # Check default exclude files
+    excluded_by_default = any(
         filename_lower == pattern.lower()
         or (
             pattern.startswith("*.")
@@ -176,3 +276,12 @@ def should_exclude_file(filename: str, exclude_files: Set[str]) -> bool:
         )
         for pattern in exclude_files
     )
+    if excluded_by_default:
+        return True
+
+    # Check gitignore
+    if gitignore_filter and rel_path:
+        if gitignore_filter.is_ignored(rel_path):
+            return True
+
+    return False

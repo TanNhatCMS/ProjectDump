@@ -13,9 +13,6 @@ def main():
     lang = input("🌐 Select language (en/vi): ").strip().lower()
     text = TEXT_EN if lang == "en" else TEXT_VI
 
-        # Select language
-    lang = input("🌐 Select language (en/vi): ").strip().lower()
-    text = TEXT_EN if lang == "en" else TEXT_VI
 
     # Argument parsing
     parser = argparse.ArgumentParser(description="PROJECTDUMP - Aggregate project source files")

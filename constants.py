@@ -3,7 +3,7 @@ MAX_FILE_SIZE = 100 * 1024 * 1024  # 100 MB
 TEXT_VI = {
     "app_title": "🚀 PROJECTDUMP",
     "input_project_path": "📂 Nhập đường dẫn thư mục dự án: ",
-    "done": "\n🎉 Hoàn thành! File source_dump.txt đã sẵn sàng.",
+    "done": "\n🎉 Hoàn thành! File project_codebase.md đã sẵn sàng.",
     "error": "\n💥 Có lỗi xảy ra trong quá trình xử lý.",
     "analyzing": "🔍 Đang phân tích dự án tại: ",
     "scanning": "🔍 Đang quét thư mục...",
@@ -21,12 +21,16 @@ TEXT_VI = {
     "line_count": "   - Tổng số dòng: {lines} dòng",
     "write_error": "❌ Lỗi ghi file: {error}",
     "not_found": "❌ Lỗi: Thư mục '{path}' không tồn tại!",
+    "project_path_label": "Đường dẫn dự án",
+    "tech_label": "Công nghệ phát hiện",
+    "ai_context": "Dưới đây là toàn bộ codebase của dự án được nén lại trong một file để AI có thể đọc và hiểu cấu trúc, logic dự án một cách nhanh chóng. Các phần bao gồm cây thư mục và nội dung tệp nguồn.",
+    "sample_prompt": "\n💡 Gợi ý prompt cho AI:\n---\nTôi đã đính kèm file `project_codebase.md` chứa toàn bộ mã nguồn của dự án. Hãy phân tích file này và giúp tôi [nhập yêu cầu của bạn tại đây, ví dụ: giải thích luồng hoạt động của tính năng X].\n---",
 }
 
 TEXT_EN = {
     "app_title": "🚀 PROJECTDUMP",
     "input_project_path": "📂 Enter the project folder path: ",
-    "done": "\n🎉 Done! The source_dump.txt file is ready.",
+    "done": "\n🎉 Done! The project_codebase.md file is ready.",
     "error": "\n💥 An error occurred during processing.",
     "analyzing": "🔍 Analyzing project at: ",
     "scanning": "🔍 Scanning directories...",
@@ -44,4 +48,8 @@ TEXT_EN = {
     "line_count": "   - Total lines: {lines}",
     "write_error": "❌ Error writing file: {error}",
     "not_found": "❌ Error: Folder '{path}' not found!",
+    "project_path_label": "Project Path",
+    "tech_label": "Detected Tech",
+    "ai_context": "The following is the complete codebase of the project aggregated into a single file for AI analysis. This allows AI to quickly understand the project structure and logic. It includes the directory tree and source file contents.",
+    "sample_prompt": "\n💡 Sample prompt for AI:\n---\nI have attached the `project_codebase.md` file which contains the full codebase of my project. Please analyze this file and help me to [enter your request here, e.g., explain the logic of feature X].\n---",
 }
